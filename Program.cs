@@ -62,15 +62,21 @@ namespace Kinect_FHC
             // Create a SpeechRecognitionEngine object for the default recognizer in the en-US locale.
             using (SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine(ri.Id))
             {
+                var voiceCommandChoices = new Choices();
+                foreach (var elec in electronics)
+                {
+                    foreach (var action in elec.Actions)
+                    {
+                        foreach (var voiceCommand in action.VoiceCommands)
+                        {
+                            voiceCommandChoices.Add(new SemanticResultValue(voiceCommand, elec.Name + "|" + action.Name));
+                        }
+                    }
+                }
 
-                // Create a grammar for finding services in different cities.
-                Choices services = new Choices(new string[] { "restaurants", "hotels", "gas stations" });
-                Choices cities = new Choices(new string[] { "Seattle", "Boston", "Dallas" });
-
-                GrammarBuilder findServices = new GrammarBuilder("Find");
-                findServices.Append(services);
-                findServices.Append("near");
-                findServices.Append(cities);
+                GrammarBuilder findServices = new GrammarBuilder();
+                findServices.Append("ジュイス");
+                findServices.Append(voiceCommandChoices);
 
                 // Create a Grammar object from the GrammarBuilder and load it to the recognizer.
                 Grammar servicesGrammar = new Grammar(findServices);
