@@ -118,7 +118,7 @@ namespace Kinect_FHC
         // Handle the SpeechRecognized event.
         static void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            Console.WriteLine("Recognized text: " + e.Result.Text);
+            Console.WriteLine("Recognized text: " + e.Result.Text + ", with confidence + " + e.Result.Confidence);
         }
     }
 }
