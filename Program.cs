@@ -13,6 +13,7 @@ namespace Kinect_FHC
     class Program
     {
         static double confidenceThreshold = 0.7;
+        static FutureHomeControllerApi api;
 
         static void Main(string[] args)
         {
@@ -28,7 +29,7 @@ namespace Kinect_FHC
                 // do nothing
             }
 
-            var api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
+            api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
             var electronics = api.GetDetailList();
 
 
@@ -97,6 +98,7 @@ namespace Kinect_FHC
                 // Add a handler for the speech recognized event.
                 recognizer.SpeechRecognized +=
                   new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
+                recognizer.SpeechRecognitionRejected += recognizer_SpeechRecognitionRejected;
 
                 // Configure the input to the speech recognizer.
                 recognizer.SetInputToDefaultAudioDevice();
@@ -111,6 +113,11 @@ namespace Kinect_FHC
                     Console.ReadLine();
                 }
             }
+        }
+
+        static void recognizer_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
+        {
+            Console.WriteLine("Recognition rejected.");
         }
 
         private static RecognizerInfo GetKinectRecognizer()
@@ -134,7 +141,12 @@ namespace Kinect_FHC
             Console.WriteLine("Recognized text: " + e.Result.Text + ", with confidence + " + e.Result.Confidence);
             if (e.Result.Confidence >= confidenceThreshold)
             {
-                // todo
+                var array = e.Result.Semantics.Value.ToString().Split('|');
+                var elec = array[0];
+                var action = array[1];
+
+                Console.WriteLine("Execute: " + elec + ", " + action);
+                api.ExecuteAction(elec, action);
             }
         }
     }

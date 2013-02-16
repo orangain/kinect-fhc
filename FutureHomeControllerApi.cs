@@ -21,9 +21,16 @@ namespace Kinect_FHC
             this.apiKey = apiKey;
         }
 
-        public IEnumerable<FutureHomeControllerElectronics> GetDetailList()
+        private JObject DoRequest(String path, Dictionary<string, string> queryParams = null)
         {
-            string url = "http://" + this.host + "/api/elec/detaillist?webapi_apikey=" + this.apiKey;
+            if (queryParams == null)
+            {
+                queryParams = new Dictionary<string, string>();
+            }
+            queryParams["webapi_apikey"] = this.apiKey;
+
+            string url = "http://" + this.host + path + "?" +
+                string.Join("&", queryParams.Select(pair => pair.Key + "=" + Uri.EscapeDataString(pair.Value)));
 
             var request = WebRequest.Create(url);
             var response = (HttpWebResponse)request.GetResponse();
@@ -33,10 +40,16 @@ namespace Kinect_FHC
 
             var responseText = reader.ReadToEnd();
 
-            var rawObj = JObject.Parse(responseText);
-            System.Diagnostics.Debug.Assert(rawObj.GetValue("result").ToString() == "ok");
+            var obj = JObject.Parse(responseText);
+            Console.WriteLine(obj);
+            System.Diagnostics.Debug.Assert(obj.GetValue("result").ToString() == "ok");
 
-            var obj = ConvertResponse(rawObj);
+            return obj;
+        }
+
+        public IEnumerable<FutureHomeControllerElectronics> GetDetailList()
+        {
+            var obj = ConvertResponse(this.DoRequest("/api/elec/detaillist"));
             Console.WriteLine(obj);
 
             var electronics = new List<FutureHomeControllerElectronics>();
@@ -63,6 +76,15 @@ namespace Kinect_FHC
             }
 
             return electronics;
+        }
+
+        public void ExecuteAction(string elec, string action)
+        {
+            var queryParams = new Dictionary<string,string>();
+            queryParams.Add("elec", elec);
+            queryParams.Add("action", action);
+
+            this.DoRequest("/api/elec/action", queryParams);
         }
 
         /// <summary>
