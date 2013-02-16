@@ -12,10 +12,22 @@ namespace Kinect_FHC
 {
     class Program
     {
+        static double confidenceThreshold = 0.7;
+
         static void Main(string[] args)
         {
             var fhcHost = args[0];
             var fhcApiKey = args[1];
+            var yobikake = args[2];
+            try
+            {
+                confidenceThreshold = Double.Parse(args[3]);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                // do nothing
+            }
+
             var api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
             var electronics = api.GetDetailList();
 
@@ -75,12 +87,12 @@ namespace Kinect_FHC
                 }
 
                 GrammarBuilder findServices = new GrammarBuilder();
-                findServices.Append("ジュイス");
+                findServices.Append(yobikake);
                 findServices.Append(voiceCommandChoices);
 
                 // Create a Grammar object from the GrammarBuilder and load it to the recognizer.
                 Grammar servicesGrammar = new Grammar(findServices);
-                recognizer.LoadGrammarAsync(servicesGrammar);
+                recognizer.LoadGrammar(servicesGrammar);
 
                 // Add a handler for the speech recognized event.
                 recognizer.SpeechRecognized +=
@@ -93,6 +105,7 @@ namespace Kinect_FHC
                 recognizer.RecognizeAsync(RecognizeMode.Multiple);
 
                 // Keep the console window open.
+                Console.WriteLine("Waiting...");
                 while (true)
                 {
                     Console.ReadLine();
@@ -119,6 +132,10 @@ namespace Kinect_FHC
         static void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             Console.WriteLine("Recognized text: " + e.Result.Text + ", with confidence + " + e.Result.Confidence);
+            if (e.Result.Confidence >= confidenceThreshold)
+            {
+                // todo
+            }
         }
     }
 }
