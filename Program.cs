@@ -14,6 +14,11 @@ namespace Kinect_FHC
     {
         static void Main(string[] args)
         {
+            var fhcHost = args[0];
+            var fhcApiKey = args[1];
+            var api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
+            api.GetDetailList();
+
             KinectSensor sensor = null;
 
             foreach (var potentialSensor in KinectSensor.KinectSensors)
