@@ -85,11 +85,10 @@ namespace Kinect_FHC
 
         public void ExecuteAction(string elec, string action)
         {
-            var queryParams = new Dictionary<string,string>();
-            queryParams.Add("elec", elec);
-            queryParams.Add("action", action);
-
-            this.DoRequest("/api/elec/action", queryParams);
+            this.DoRequest("/api/elec/action", new Dictionary<string, string> {
+                {"elec", elec},
+                {"action", action},
+            });
         }
 
         /// <summary>
