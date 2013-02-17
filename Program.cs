@@ -87,6 +87,7 @@ namespace Kinect_FHC
                     {
                         foreach (var voiceCommand in action.VoiceCommands)
                         {
+                            logger.InfoFormat("VoiceCommand: {0}, {1}, {2}", voiceCommand, elec.Name, action.Name);
                             voiceCommandChoices.Add(new SemanticResultValue(voiceCommand, elec.Name + "|" + action.Name));
                         }
                     }
