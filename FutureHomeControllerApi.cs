@@ -34,6 +34,8 @@ namespace Kinect_FHC
             string url = "http://" + this.host + path + "?" +
                 string.Join("&", queryParams.Select(pair => pair.Key + "=" + Uri.EscapeDataString(pair.Value)));
 
+            logger.InfoFormat("Requesting url: {0}", url);
+
             var request = WebRequest.Create(url);
             var response = (HttpWebResponse)request.GetResponse();
 
