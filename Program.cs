@@ -102,8 +102,7 @@ namespace Kinect_FHC
                 recognizer.LoadGrammar(servicesGrammar);
 
                 // Add a handler for the speech recognized event.
-                recognizer.SpeechRecognized +=
-                  new EventHandler<SpeechRecognizedEventArgs>(recognizer_SpeechRecognized);
+                recognizer.SpeechRecognized += recognizer_SpeechRecognized;
                 recognizer.SpeechRecognitionRejected += recognizer_SpeechRecognitionRejected;
 
                 // Configure the input to the speech recognizer.
@@ -119,11 +118,6 @@ namespace Kinect_FHC
                     Console.ReadLine();
                 }
             }
-        }
-
-        static void recognizer_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
-        {
-            logger.Info("Recognition rejected.");
         }
 
         private static RecognizerInfo GetKinectRecognizer()
@@ -154,6 +148,11 @@ namespace Kinect_FHC
                 logger.Info("Match: " + elec + ", " + action);
                 api.ExecuteAction(elec, action);
             }
+        }
+
+        static void recognizer_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
+        {
+            logger.Info("Recognition rejected.");
         }
     }
 }
