@@ -12,6 +12,8 @@ namespace Kinect_FHC
 {
     public class FutureHomeControllerApi
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         private string host;
         private string apiKey;
 
@@ -41,7 +43,8 @@ namespace Kinect_FHC
             var responseText = reader.ReadToEnd();
 
             var obj = JObject.Parse(responseText);
-            Console.WriteLine(obj);
+            logger.Debug(obj.ToString());
+
             System.Diagnostics.Debug.Assert(obj.GetValue("result").ToString() == "ok");
 
             return obj;
@@ -50,7 +53,7 @@ namespace Kinect_FHC
         public IEnumerable<FutureHomeControllerElectronics> GetDetailList()
         {
             var obj = ConvertResponse(this.DoRequest("/api/elec/detaillist"));
-            Console.WriteLine(obj);
+            logger.Debug(obj.ToString());
 
             var electronics = new List<FutureHomeControllerElectronics>();
 

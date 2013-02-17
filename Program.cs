@@ -12,11 +12,16 @@ namespace Kinect_FHC
 {
     class Program
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         static double confidenceThreshold = 0.7;
         static FutureHomeControllerApi api;
 
         static void Main(string[] args)
         {
+            logger.Info("Program started.");
+            logger.InfoFormat("Arguments: {0}", string.Join(" ", args));
+
             var fhcHost = args[0];
             var fhcApiKey = args[1];
             var yobikake = args[2];
@@ -60,7 +65,7 @@ namespace Kinect_FHC
 
             if (null == sensor)
             {
-                Console.WriteLine("Kinect not found");
+                logger.Error("Kinect not found");
                 return;
             }
 
@@ -68,7 +73,7 @@ namespace Kinect_FHC
 
             if (null == ri)
             {
-                Console.WriteLine("Recognizer not found");
+                logger.Error("Recognizer not found");
                 return;
             }
 
@@ -107,7 +112,7 @@ namespace Kinect_FHC
                 recognizer.RecognizeAsync(RecognizeMode.Multiple);
 
                 // Keep the console window open.
-                Console.WriteLine("Waiting...");
+                logger.Info("Waiting...");
                 while (true)
                 {
                     Console.ReadLine();
@@ -117,7 +122,7 @@ namespace Kinect_FHC
 
         static void recognizer_SpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
         {
-            Console.WriteLine("Recognition rejected.");
+            logger.Info("Recognition rejected.");
         }
 
         private static RecognizerInfo GetKinectRecognizer()
@@ -138,14 +143,14 @@ namespace Kinect_FHC
         // Handle the SpeechRecognized event.
         static void recognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            Console.WriteLine("Recognized text: " + e.Result.Text + ", with confidence + " + e.Result.Confidence);
+            logger.Info("Recognized text: " + e.Result.Text + ", with confidence " + e.Result.Confidence);
             if (e.Result.Confidence >= confidenceThreshold)
             {
                 var array = e.Result.Semantics.Value.ToString().Split('|');
                 var elec = array[0];
                 var action = array[1];
 
-                Console.WriteLine("Execute: " + elec + ", " + action);
+                logger.Info("Match: " + elec + ", " + action);
                 api.ExecuteAction(elec, action);
             }
         }
