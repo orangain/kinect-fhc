@@ -91,6 +91,18 @@ namespace Kinect_FHC
             });
         }
 
+        public IEnumerable<string> GetRecognitionList()
+        {
+            return (this.DoRequest("/api/recong/list")["list"] as JArray).Select(c => (string)c);
+        }
+
+        public void FireRecognition(string voice)
+        {
+            this.DoRequest("/api/recong/firebystring", new Dictionary<string, string> {
+                {"str", voice},
+            });
+        }
+
         /// <summary>
         /// FHCのAPIが返すJSONはフラットになっていて扱いにくいので、階層化する
         /// </summary>

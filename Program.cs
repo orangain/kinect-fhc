@@ -36,7 +36,7 @@ namespace Kinect_FHC
 
             api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
             var electronics = api.GetDetailList();
-
+            var voiceCommands = api.GetRecognitionList();
 
             KinectSensor sensor = null;
 
@@ -81,16 +81,10 @@ namespace Kinect_FHC
             using (SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine(ri.Id))
             {
                 var voiceCommandChoices = new Choices();
-                foreach (var elec in electronics)
+                foreach (var voiceCommand in voiceCommands)
                 {
-                    foreach (var action in elec.Actions)
-                    {
-                        foreach (var voiceCommand in action.VoiceCommands)
-                        {
-                            logger.InfoFormat("VoiceCommand: {0}, {1}, {2}", voiceCommand, elec.Name, action.Name);
-                            voiceCommandChoices.Add(new SemanticResultValue(voiceCommand, elec.Name + "|" + action.Name));
-                        }
-                    }
+                    voiceCommandChoices.Add(voiceCommand);
+                    logger.InfoFormat("Registered voice command: {0}", voiceCommand);
                 }
 
                 GrammarBuilder findServices = new GrammarBuilder();
@@ -141,12 +135,8 @@ namespace Kinect_FHC
             logger.Info("Recognized text: " + e.Result.Text + ", with confidence " + e.Result.Confidence);
             if (e.Result.Confidence >= confidenceThreshold)
             {
-                var array = e.Result.Semantics.Value.ToString().Split('|');
-                var elec = array[0];
-                var action = array[1];
-
-                logger.Info("Match: " + elec + ", " + action);
-                api.ExecuteAction(elec, action);
+                logger.Info("Match: " + e.Result.Text);
+                api.FireRecognition(e.Result.Text);
             }
         }
 
