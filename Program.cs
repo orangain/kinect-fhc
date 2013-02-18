@@ -136,7 +136,7 @@ namespace Kinect_FHC
             if (e.Result.Confidence >= confidenceThreshold)
             {
                 logger.Info("Match: " + e.Result.Text);
-                api.FireRecognition(e.Result.Text);
+                api.FireRecognition(e.Result.Words[1].Text);
             }
         }
 
