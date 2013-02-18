@@ -43,6 +43,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files\Microsoft SDKs\Speech\v11.0\Assembly\Microsoft.Speech.dll</HintPath>
     </Reference>
+    <Reference Include="NDesk.Options">
+      <HintPath>packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>

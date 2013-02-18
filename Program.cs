@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Kinect;
 using Microsoft.Speech.AudioFormat;
 using Microsoft.Speech.Recognition;
+using NDesk.Options;
 
 namespace Kinect_FHC
 {
@@ -15,6 +16,7 @@ namespace Kinect_FHC
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         static double confidenceThreshold = 0.7;
+        static string soundFileName = "";
         static FutureHomeControllerApi api;
 
         static void Main(string[] args)
@@ -22,20 +24,46 @@ namespace Kinect_FHC
             logger.Info("Program started.");
             logger.InfoFormat("Arguments: {0}", string.Join(" ", args));
 
-            var fhcHost = args[0];
-            var fhcApiKey = args[1];
-            var yobikake = args[2];
+            var p = new OptionSet(){
+                {"threshold=", "confidence {THRESHOLD}", v => confidenceThreshold = Double.Parse(v) },
+                {"sound=", "{FILE} played when recognized", v => soundFileName = v },
+            };
+
+            string[] restArgs;
             try
             {
-                confidenceThreshold = Double.Parse(args[3]);
+                restArgs = p.Parse(args).ToArray();
+            }
+            catch (OptionException)
+            {
+                logger.Info("Failed to parse options.");
+                Usage(p);
+                return;
+            }
+
+            string fhcHost = "";
+            string fhcApiKey = "";
+            string yobikake = "";
+            try
+            {
+                fhcHost = restArgs[0];
+                fhcApiKey = restArgs[1];
+                yobikake = restArgs[2];
             }
             catch (IndexOutOfRangeException)
             {
-                // do nothing
+                logger.Info("Too less arguments.");
+                Usage(p);
+                return;
             }
 
+            logger.InfoFormat("FHC Host: {0}", fhcHost);
+            logger.InfoFormat("FHC API Key: {0}", fhcApiKey);
+            logger.InfoFormat("Yobikake: {0}", yobikake);
+            logger.InfoFormat("Confidence Threshold: {0}", confidenceThreshold);
+            logger.InfoFormat("Sound File Name: {0}", soundFileName);
+
             api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
-            var electronics = api.GetDetailList();
             var voiceCommands = api.GetRecognitionList();
 
             KinectSensor sensor = null;
@@ -114,6 +142,15 @@ namespace Kinect_FHC
             }
         }
 
+        private static void Usage(OptionSet p)
+        {
+            Console.WriteLine ("Usage: Kinect-FHC.exe [OPTIONS] HOST APIKEY YOBIKAKE");
+            Console.WriteLine ("Use Kinect voice recognition engine instead of FHC's built-in engine.");
+            Console.WriteLine ();
+            Console.WriteLine ("Options:");
+            p.WriteOptionDescriptions (Console.Out);
+        }
+
         private static RecognizerInfo GetKinectRecognizer()
         {
             foreach (RecognizerInfo recognizer in SpeechRecognitionEngine.InstalledRecognizers())
@@ -136,6 +173,10 @@ namespace Kinect_FHC
             if (e.Result.Confidence >= confidenceThreshold)
             {
                 logger.Info("Match: " + e.Result.Text);
+                if (!string.IsNullOrEmpty(soundFileName))
+                {
+                    api.Play(soundFileName);
+                }
                 api.FireRecognition(e.Result.Words[1].Text);
             }
         }

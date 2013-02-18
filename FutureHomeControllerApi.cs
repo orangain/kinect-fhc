@@ -103,6 +103,14 @@ namespace Kinect_FHC
             });
         }
 
+        public void Play(string fileName)
+        {
+            this.DoRequest("/api/play", new Dictionary<string, string>(){
+                {"name", fileName},
+                {"async", "1"},
+            });
+        }
+
         /// <summary>
         /// FHCのAPIが返すJSONはフラットになっていて扱いにくいので、階層化する
         /// </summary>
