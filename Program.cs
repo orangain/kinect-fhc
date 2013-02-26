@@ -17,6 +17,8 @@ namespace Kinect_FHC
 
         static double confidenceThreshold = 0.7;
         static string soundFileName = "";
+        static bool dryRun = false;
+
         static FutureHomeControllerApi api;
 
         static void Main(string[] args)
@@ -27,6 +29,7 @@ namespace Kinect_FHC
             var p = new OptionSet(){
                 {"threshold=", "confidence {THRESHOLD}", v => confidenceThreshold = Double.Parse(v) },
                 {"sound=", "{FILE} played when recognized", v => soundFileName = v },
+                {"dry-run", "Recognize speech but not execute commands", v => dryRun = true },
             };
 
             string[] restArgs;
@@ -62,6 +65,7 @@ namespace Kinect_FHC
             logger.InfoFormat("Yobikake: {0}", yobikake);
             logger.InfoFormat("Confidence Threshold: {0}", confidenceThreshold);
             logger.InfoFormat("Sound File Name: {0}", soundFileName);
+            logger.InfoFormat("Dry run: {0}", dryRun);
 
             api = new FutureHomeControllerApi(fhcHost, fhcApiKey);
             var voiceCommands = api.GetRecognitionList();
@@ -173,6 +177,12 @@ namespace Kinect_FHC
             if (e.Result.Confidence >= confidenceThreshold)
             {
                 logger.Info("Match: " + e.Result.Text);
+                if (dryRun)
+                {
+                    // do not fire
+                    return;
+                }
+
                 if (!string.IsNullOrEmpty(soundFileName))
                 {
                     api.Play(soundFileName);
