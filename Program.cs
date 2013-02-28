@@ -24,6 +24,25 @@ namespace Kinect_FHC
         static void Main(string[] args)
         {
             logger.Info("Program started.");
+
+            try
+            {
+                DoMain(args);
+            }
+#if !DEBUG
+            catch (Exception ex)
+            {
+                logger.Fatal("Uncaght Exception", ex);
+            }
+#endif
+            finally
+            {
+                // do nothing
+            }
+        }
+
+        private static void DoMain(string[] args)
+        {
             logger.InfoFormat("Arguments: {0}", string.Join(" ", args));
 
             var p = new OptionSet(){
