@@ -64,10 +64,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="package.ps1" />
     <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>set TARGET_DIR_WITH_BACKSLASH=$(TargetDir)
+set TARGET_DIR_WITHOUT_BACKSLASH=%25TARGET_DIR_WITH_BACKSLASH:~0,-1%25
+set DEST_PATH=%25TARGET_DIR_WITHOUT_BACKSLASH%25.zip
+set SRC_DIR=%25TARGET_DIR_WITHOUT_BACKSLASH%25
+
+powershell -ExecutionPolicy RemoteSigned -File "$(ProjectDir)package.ps1" "%25DEST_PATH%25" "%25SRC_DIR%25"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
