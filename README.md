@@ -3,6 +3,11 @@ Kinect-FHC
 
 [Future Home Controller](http://rti-giken.jp/) の音声認識にKinectを使う試み。
 
+ダウンロード
+============
+https://www.dropbox.com/s/dn4zhywqpu19xn4/Kinect-FHC-20130226-341ef50.zip
+
+※バイナリはソースよりも古い可能性が高いです。
 
 実行方法
 ========
