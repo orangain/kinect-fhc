@@ -25,20 +25,14 @@ namespace Kinect_FHC
         {
             logger.Info("Program started.");
 
-            try
-            {
-                DoMain(args);
-            }
-#if !DEBUG
-            catch (Exception ex)
-            {
-                logger.Fatal("Uncaght Exception", ex);
-            }
-#endif
-            finally
-            {
-                // do nothing
-            }
+            System.AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            DoMain(args);
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            logger.Fatal("Unhandled Exception", e.ExceptionObject as Exception);
         }
 
         private static void DoMain(string[] args)
