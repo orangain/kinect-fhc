@@ -37,19 +37,25 @@ namespace Kinect_FHC
             logger.InfoFormat("Requesting url: {0}", url);
 
             var request = WebRequest.Create(url);
-            var response = (HttpWebResponse)request.GetResponse();
+            try
+            {
+                var response = (HttpWebResponse)request.GetResponse();
 
-            var dataStream = response.GetResponseStream();
-            var reader = new StreamReader(dataStream);
+                var dataStream = response.GetResponseStream();
+                var reader = new StreamReader(dataStream);
 
-            var responseText = reader.ReadToEnd();
+                var responseText = reader.ReadToEnd();
 
-            var obj = JObject.Parse(responseText);
-            logger.Debug(obj.ToString());
+                var obj = JObject.Parse(responseText);
+                logger.Debug(obj.ToString());
 
-            System.Diagnostics.Debug.Assert(obj.GetValue("result").ToString() == "ok");
-
-            return obj;
+                System.Diagnostics.Debug.Assert(obj.GetValue("result").ToString() == "ok");
+                return obj;
+            }
+            catch (WebException ex)
+            {
+                throw new FutureHomeControllerApiException("Failed to call API", ex);
+            }
         }
 
         public IEnumerable<FutureHomeControllerElectronics> GetDetailList()
@@ -203,6 +209,29 @@ namespace Kinect_FHC
             {
                 this.Actions = new List<FutureHomeControllerAction>();
             }
+        }
+    }
+
+    class FutureHomeControllerApiException : Exception
+    {
+        public FutureHomeControllerApiException()
+        {
+        }
+
+        public FutureHomeControllerApiException(string message)
+            : base(message)
+        {
+        }
+
+        protected FutureHomeControllerApiException(System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public FutureHomeControllerApiException(string message, Exception innerException)
+            : base(message, innerException)
+        {
         }
     }
 }

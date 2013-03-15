@@ -196,11 +196,19 @@ namespace Kinect_FHC
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(soundFileName))
+                try
                 {
-                    api.Play(soundFileName);
+                    if (!string.IsNullOrEmpty(soundFileName))
+                    {
+                        api.Play(soundFileName);
+                    }
+                    api.FireRecognition(e.Result.Words[1].Text);
                 }
-                api.FireRecognition(e.Result.Words[1].Text);
+                catch (FutureHomeControllerApiException ex)
+                {
+                    logger.Error(ex.Message, ex);
+                    // ignore
+                }
             }
         }
 
